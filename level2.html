@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Генератор JSON</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 0 20px; background: #fafafa; }
+        .section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        pre { background: #272822; color: #f8f8f2; padding: 15px; border-radius: 4px; overflow-x: auto; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+    const { useState } = React;
+    const e = React.createElement;
+
+    function JsonGenerator() {
+        const [formData, setFormData] = useState({
+            university: "",
+            department: "",
+            course: "",
+            project: ""
+        });
+
+        const handleChange = (evt) => {
+            const { name, value } = evt.target;
+            setFormData(prev => ({ ...prev, [name]: value }));
+        };
+
+        const jsonString = JSON.stringify(formData, null, 4);
+
+        const handleDownload = () => {
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "generated_data.json";
+            link.click();
+            URL.revokeObjectURL(url);
+        };
+
+        return e('div', null,
+            e('h1', null, 'Генератор JSON'),
+            e('div', { className: 'section' },
+                e('div', { className: 'form-group' },
+                    e('label', null, 'Університет'),
+                    e('input', { type: 'text', name: 'university', value: formData.university, onChange: handleChange })
+                ),
+                e('div', { className: 'form-group' },
+                    e('label', null, 'Кафедра'),
+                    e('input', { type: 'text', name: 'department', value: formData.department, onChange: handleChange })
+                ),
+                e('div', { className: 'form-group' },
+                    e('label', null, 'Курс'),
+                    e('input', { type: 'number', name: 'course', value: formData.course, onChange: handleChange })
+                ),
+                e('div', { className: 'form-group' },
+                    e('label', null, 'Назва проєкту'),
+                    e('input', { type: 'text', name: 'project', value: formData.project, onChange: handleChange })
+                ),
+                e('button', { onClick: handleDownload }, 'Зберегти JSON на диск')
+            ),
+            e('div', { className: 'section' },
+                e('h3', null, 'Згенерований структурований код:'),
+                e('pre', null, jsonString)
+            )
+        );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(e(JsonGenerator));
+</script>
+</body>
+</html>

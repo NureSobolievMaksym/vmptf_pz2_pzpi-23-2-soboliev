@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Прогноз погоди</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-content: center; height: 100vh; margin: 0; padding-top: 10vh; }
+        .weather-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; width: 300px; height: fit-content; }
+        h2 { margin-top: 0; }
+        .temp { font-size: 2rem; font-weight: bold; color: #007bff; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div class="weather-card">
+    <h2>Погода в Лозовій</h2>
+    <div id="loading">Завантаження...</div>
+    <div id="weather-info" style="display: none;">
+        <div class="temp" id="temperature"></div>
+        <div id="description"></div>
+    </div>
+</div>
+
+<script>
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=48.89&longitude=36.31&current_weather=true';
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Помилка мережі');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const weather = data.current_weather;
+            
+            document.getElementById('temperature').innerText = `${weather.temperature}°C`;
+            document.getElementById('description').innerText = `Швидкість вітру: ${weather.windspeed} км/год`;
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('weather-info').style.display = 'block';
+        })
+        .catch(error => {
+            document.getElementById('loading').innerText = 'Не вдалося завантажити дані';
+            console.error('Error:', error);
+        });
+</script>
+
+</body>
+</html>
